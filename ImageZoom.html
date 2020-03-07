@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ImageZoom</title>
+  <style>
+    .container{
+      position: relative;
+     }
+    .start{
+      width: 400px;
+      height: 400px;
+    }
+    .final{
+      border-radius: 50%;
+      width: 300px;
+      height: 300px;
+      border: 2px solid #000;
+     }
+     .lens{
+       border-radius: 50%;
+       width: 50px;
+       height: 50px;
+       position: absolute;
+       border: 2px solid #fff;
+      }
+  </style>
+</head>
+<body>
+  <script>
+    function zoomTheImage(zoomedId, imgId){
+      var imgID = document.getElementById(imgId);
+      var zoomedID = document.getElementById(zoomedId);
+      var lens = document.createElement("DIV");
+      lens.setAttribute("class", "lens");
+      imgID.parentElement.insertBefore(lens, imgID);
+      var xr = zoomedID.offsetWidth/lens.offsetWidth;
+      var yr = zoomedID.offsetHeight/lens.offsetHeight;
+      zoomedID.style.backgroundImage = 'url("'+imgID.src+'")';
+      zoomedID.style.backgroundSize = imgID.width*xr + "px " + imgID.height*yr + "px";
+      lens.addEventListener("mousemove", zoomThis);
+      lens.addEventListener("touchmove", zoomThis);
+
+      imgID.addEventListener("mousemove", zoomThis);
+      imgID.addEventListener("touchmove", zoomThis);
+
+      function zoomThis(e){
+        e.preventDefault();
+        var cursorPos = cursorPosition(e);
+        var lensx = cursorPos.x - lens.offsetWidth/2;
+        var lensy = cursorPos.y - lens.offsetHeight/2;
+        if(lensx > imgID.offsetWidth - lens.offsetWidth ){
+          lensx = imgID.offsetWidth - lens.offsetWidth;
+         }
+        if(lensx < 0){
+          lensx = 0;
+         }
+        if(lensy > imgID.offsetHeight - lens.offsetHeight){
+          lensy = imgID.offsetHeight - lens.offsetHeight;
+         }
+         if(lensy < 0){
+          lensy = 0;
+         }
+         lens.style.left = lensx + "px";
+         lens.style.top = lensy + "px";
+         
+         zoomedID.style.backgroundPosition = "-" + lensx*xr + "px -" + lensy*yr + "px";
+      }
+      
+      function cursorPosition(e){
+        e = e || window.event;
+        var imgRect = imgID.getBoundingClientRect();
+        var x = e.pageX - imgRect.left;
+        var y = e.pageY - imgRect.top;
+        x = x - window.pageXOffset;
+        y = y - window.pageYOffset;
+        return {x: x, y: y};
+    }
+    }
+
+  </script>
+  <p>Move mouse over Image.</p>
+  <div class="container">
+    <img src = "../world.jpg" class = "start" id = "imageInput" alt = "image">
+    <div class = "final" id = "zoomedImage"></div>
+  </div>
+
+  <script>zoomTheImage("zoomedImage", "imageInput");</script>
+</body>
+</html>
